@@ -1,0 +1,12 @@
+[package]
+name = "propkit"
+version = "0.0.1"
+edition = "2024"
+license = "MIT OR Apache-2.0"
+description = "Reusable proptest property suites ported from Hypothesis"
+
+[dependencies]
+
+[dev-dependencies]
+proptest = "1"
+regex = "1"
