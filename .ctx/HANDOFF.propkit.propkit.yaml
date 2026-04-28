@@ -1,0 +1,36 @@
+project: propkit
+updated: 2026-04-28
+items:
+  - id: pk-001
+    title: Add datetime module (chrono)
+    status: open
+    priority: P2
+    notes: Port test_datetimes.py — bounds, naive vs aware, leap year reachability
+  - id: pk-002
+    title: Add uuid module
+    status: open
+    priority: P2
+    notes: Port test_uuids.py — no nil by default, version field constraint
+  - id: pk-003
+    title: Add recursive data module
+    status: open
+    priority: P2
+    notes: Port test_recursive.py — leaf count bounds via prop_recursive
+  - id: pk-004
+    title: Add complex number module (num-complex)
+    status: open
+    priority: P3
+    notes: Port test_complex_numbers.py — magnitude bounds, subnormal filtering
+  - id: pk-005
+    title: Add CI workflow
+    status: open
+    priority: P1
+    notes: GitHub Actions — cargo test, clippy, fmt check
+  - id: pk-006
+    title: Add LICENSE files
+    status: open
+    priority: P1
+    notes: MIT + Apache-2.0 dual license files
+log:
+  - date: 2026-04-28
+    note: "Initial crate created with 99 tests across 9 modules — 9d73bf0"
