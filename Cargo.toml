@@ -8,5 +8,7 @@ description = "Reusable proptest property suites ported from Hypothesis"
 [dependencies]
 
 [dev-dependencies]
+chrono = "0.4"
 proptest = "1"
 regex = "1"
+uuid = { version = "1", features = ["v4"] }

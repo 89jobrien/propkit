@@ -9,11 +9,15 @@ mod collections;
 #[cfg(test)]
 mod composition;
 #[cfg(test)]
+mod datetimes;
+#[cfg(test)]
 mod floats;
 #[cfg(test)]
 mod numerics;
 #[cfg(test)]
 mod permutations;
+#[cfg(test)]
+mod recursive;
 #[cfg(test)]
 mod regex_props;
 #[cfg(test)]
@@ -22,3 +26,5 @@ mod sampling;
 mod slices;
 #[cfg(test)]
 mod strings;
+#[cfg(test)]
+mod uuids;
