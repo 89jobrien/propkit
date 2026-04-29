@@ -1,34 +1,10 @@
 // Ported from: test_regex.py
 // Properties: generated strings match the source regex pattern
 
+use propkit::strategies::regex_props::{re_digits, re_email, re_hex, re_ipv4, re_word};
 use proptest::prelude::*;
-use regex::Regex;
-use std::sync::OnceLock;
-
-fn re_digits() -> &'static Regex {
-    static RE: OnceLock<Regex> = OnceLock::new();
-    RE.get_or_init(|| Regex::new(r"^[0-9]+$").unwrap())
-}
-fn re_word() -> &'static Regex {
-    static RE: OnceLock<Regex> = OnceLock::new();
-    RE.get_or_init(|| Regex::new(r"^\w+$").unwrap())
-}
-fn re_hex() -> &'static Regex {
-    static RE: OnceLock<Regex> = OnceLock::new();
-    RE.get_or_init(|| Regex::new(r"^[0-9a-fA-F]{8}$").unwrap())
-}
-fn re_email() -> &'static Regex {
-    static RE: OnceLock<Regex> = OnceLock::new();
-    RE.get_or_init(|| Regex::new(r"^[a-z]{1,10}@[a-z]{1,10}\.[a-z]{2,4}$").unwrap())
-}
-fn re_ipv4() -> &'static Regex {
-    static RE: OnceLock<Regex> = OnceLock::new();
-    RE.get_or_init(|| Regex::new(r"^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$").unwrap())
-}
 
 proptest! {
-    // -- Core property: generated string matches the pattern --
-
     #[test]
     fn digits_match(s in "[0-9]+") {
         prop_assert!(re_digits().is_match(&s), "'{s}' does not match [0-9]+");
@@ -56,8 +32,6 @@ proptest! {
         prop_assert!(re_ipv4().is_match(&s), "'{s}' does not match IPv4 pattern");
     }
 
-    // -- Character class membership --
-
     #[test]
     fn whitespace_class(s in r"\s+") {
         prop_assert!(
@@ -82,8 +56,6 @@ proptest! {
         );
     }
 
-    // -- Anchoring: full match --
-
     #[test]
     fn anchored_pattern(s in "abc") {
         prop_assert_eq!(s, "abc");
@@ -97,8 +69,6 @@ proptest! {
         );
     }
 
-    // -- Dot does not produce newline (by default in proptest regex) --
-
     #[test]
     fn dot_no_newline(s in ".{1,20}") {
         prop_assert!(
@@ -106,8 +76,6 @@ proptest! {
             "dot produced newline in '{s}'"
         );
     }
-
-    // -- Optional and repetition --
 
     #[test]
     fn optional_group(s in "a(bc)?d") {
@@ -124,9 +92,6 @@ proptest! {
         prop_assert!(!s.is_empty());
         prop_assert!(s.chars().all(|c| c == 'a'));
     }
-
-    // -- Output type matches pattern type --
-    // In Rust, proptest regex always produces String (UTF-8)
 
     #[test]
     fn output_is_utf8(s in ".*") {

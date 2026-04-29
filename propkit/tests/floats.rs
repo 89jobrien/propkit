@@ -1,6 +1,7 @@
 // Ported from: test_float_nastiness.py, test_subnormal_floats.py
 // Properties: bounds, NaN/inf filtering, subnormal control, next_up/next_down
 
+use propkit::strategies::floats::{next_down_f64, next_up_f64};
 use proptest::prelude::*;
 
 proptest! {
@@ -43,8 +44,6 @@ proptest! {
     }
 
     // -- Subnormal control --
-    // proptest generates subnormals by default in any_f64; filter them out
-    // and verify the filter works
 
     #[test]
     fn no_subnormals_when_filtered(
@@ -82,24 +81,20 @@ proptest! {
     }
 
     // -- Sign of zero --
-    // Verify we can distinguish +0.0 and -0.0 via bit patterns
 
     #[test]
     fn zero_has_correct_sign_bit(
         x in prop_oneof![Just(0.0f64), Just(-0.0f64)]
     ) {
         prop_assert!(x == 0.0);
-        // Both +0.0 and -0.0 compare equal but have different bit patterns
         let bits = x.to_bits();
         prop_assert!(bits == 0u64 || bits == 1u64 << 63);
     }
 
-    // -- next_up / next_down round-trip (nightly feature on stable via
-    //    bit manipulation) --
+    // -- next_up / next_down round-trip --
 
     #[test]
     fn next_up_down_roundtrip(x in proptest::num::f64::NORMAL) {
-        // NORMAL already excludes NaN and infinity.
         let up = next_up_f64(x);
         let down = next_down_f64(up);
         prop_assert_eq!(down, x);
@@ -107,7 +102,6 @@ proptest! {
 
     #[test]
     fn next_down_up_roundtrip(x in proptest::num::f64::NORMAL) {
-        // NORMAL already excludes NaN and infinity.
         let down = next_down_f64(x);
         let up = next_up_f64(down);
         prop_assert_eq!(up, x);
@@ -125,42 +119,5 @@ proptest! {
     fn down_means_lesser(x in proptest::num::f64::NORMAL) {
         let down = next_down_f64(x);
         prop_assert!(down <= x, "next_down({x}) = {down} > {x}");
-    }
-}
-
-// Stable-Rust next_up / next_down via bit manipulation
-fn next_up_f64(x: f64) -> f64 {
-    if x.is_nan() {
-        return x;
-    }
-    if x == f64::NEG_INFINITY {
-        return f64::MIN;
-    }
-    if x == 0.0 && x.is_sign_negative() {
-        return 0.0;
-    }
-    let bits = x.to_bits();
-    if x >= 0.0 {
-        f64::from_bits(bits + 1)
-    } else {
-        f64::from_bits(bits - 1)
-    }
-}
-
-fn next_down_f64(x: f64) -> f64 {
-    if x.is_nan() {
-        return x;
-    }
-    if x == f64::INFINITY {
-        return f64::MAX;
-    }
-    if x == 0.0 && !x.is_sign_negative() {
-        return -0.0;
-    }
-    let bits = x.to_bits();
-    if x > 0.0 {
-        f64::from_bits(bits - 1)
-    } else {
-        f64::from_bits(bits + 1)
     }
 }
