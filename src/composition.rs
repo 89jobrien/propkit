@@ -51,7 +51,7 @@ proptest! {
             proptest::collection::vec(any::<u8>(), n..=n)
         })
     ) {
-        prop_assert!(v.len() >= 1 && v.len() <= 5);
+        prop_assert!(!v.is_empty() && v.len() <= 5);
     }
 
     // -- Chained maps: post-map values satisfy transformed predicate --
@@ -61,7 +61,7 @@ proptest! {
         x in (0..100i32).prop_map(|x| x * 2)
     ) {
         prop_assert!(x % 2 == 0, "{x} is not even");
-        prop_assert!(x >= 0 && x <= 198);
+        prop_assert!((0..=198).contains(&x));
     }
 
     // -- Filter + map composition --
@@ -87,8 +87,8 @@ proptest! {
             )
         })
     ) {
-        prop_assert!(v.len() >= 1 && v.len() <= 3);
-        prop_assert!(v.iter().all(|&b| b >= b'0' && b <= b'9'));
+        prop_assert!(!v.is_empty() && v.len() <= 3);
+        prop_assert!(v.iter().all(|&b| b.is_ascii_digit()));
     }
 
     // -- Dependent pair: second value bounded by first --

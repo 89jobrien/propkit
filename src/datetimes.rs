@@ -53,11 +53,9 @@ proptest! {
     ) {
         let min = NaiveDate::from_ymd_opt(min_year, month, day).unwrap();
         let generated = NaiveDate::from_ymd_opt(gen_year, gen_month, gen_day).unwrap();
-        // Only assert when generated is within the min..=max range we would
-        // have set. Here we simulate: if generated >= min, the bound holds.
-        if generated >= min {
-            prop_assert!(generated >= min);
-        }
+        // Use prop_assume to restrict to the interesting case, then assert.
+        prop_assume!(generated >= min);
+        prop_assert!(generated >= min);
     }
 
     /// Generated date is <= an explicit max_date.
@@ -72,9 +70,8 @@ proptest! {
     ) {
         let max = NaiveDate::from_ymd_opt(max_year, month, day).unwrap();
         let generated = NaiveDate::from_ymd_opt(gen_year, gen_month, gen_day).unwrap();
-        if generated <= max {
-            prop_assert!(generated <= max);
-        }
+        prop_assume!(generated <= max);
+        prop_assert!(generated <= max);
     }
 
     /// A date generated within [min, max] satisfies both bounds simultaneously.
@@ -190,10 +187,9 @@ proptest! {
         let min = Duration::seconds(min_secs);
         let max = Duration::seconds(max_secs);
         let d = Duration::seconds(secs);
-        if d >= min && d <= max {
-            prop_assert!(d >= min);
-            prop_assert!(d <= max);
-        }
+        prop_assume!(d >= min && d <= max);
+        prop_assert!(d >= min);
+        prop_assert!(d <= max);
     }
 
     /// Non-negative durations are >= zero.

@@ -77,7 +77,7 @@ proptest! {
         let leaves = flatten(&tree);
         for v in &leaves {
             // i32::MIN and i32::MAX are valid; just confirm the type compiles
-            prop_assert!(*v >= i32::MIN && *v <= i32::MAX);
+            prop_assert!((i32::MIN..=i32::MAX).contains(v));
         }
     }
 

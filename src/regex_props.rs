@@ -3,42 +3,57 @@
 
 use proptest::prelude::*;
 use regex::Regex;
+use std::sync::OnceLock;
+
+fn re_digits() -> &'static Regex {
+    static RE: OnceLock<Regex> = OnceLock::new();
+    RE.get_or_init(|| Regex::new(r"^[0-9]+$").unwrap())
+}
+fn re_word() -> &'static Regex {
+    static RE: OnceLock<Regex> = OnceLock::new();
+    RE.get_or_init(|| Regex::new(r"^\w+$").unwrap())
+}
+fn re_hex() -> &'static Regex {
+    static RE: OnceLock<Regex> = OnceLock::new();
+    RE.get_or_init(|| Regex::new(r"^[0-9a-fA-F]{8}$").unwrap())
+}
+fn re_email() -> &'static Regex {
+    static RE: OnceLock<Regex> = OnceLock::new();
+    RE.get_or_init(|| Regex::new(r"^[a-z]{1,10}@[a-z]{1,10}\.[a-z]{2,4}$").unwrap())
+}
+fn re_ipv4() -> &'static Regex {
+    static RE: OnceLock<Regex> = OnceLock::new();
+    RE.get_or_init(|| Regex::new(r"^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$").unwrap())
+}
 
 proptest! {
     // -- Core property: generated string matches the pattern --
 
     #[test]
     fn digits_match(s in "[0-9]+") {
-        let re = Regex::new(r"^[0-9]+$").unwrap();
-        prop_assert!(re.is_match(&s), "'{s}' does not match [0-9]+");
+        prop_assert!(re_digits().is_match(&s), "'{s}' does not match [0-9]+");
     }
 
     #[test]
     fn word_chars_match(s in r"\w+") {
-        let re = Regex::new(r"^\w+$").unwrap();
-        prop_assert!(re.is_match(&s), "'{s}' does not match \\w+");
+        prop_assert!(re_word().is_match(&s), "'{s}' does not match \\w+");
     }
 
     #[test]
     fn hex_pattern_match(s in "[0-9a-fA-F]{8}") {
-        let re = Regex::new(r"^[0-9a-fA-F]{8}$").unwrap();
-        prop_assert!(re.is_match(&s), "'{s}' does not match hex pattern");
+        prop_assert!(re_hex().is_match(&s), "'{s}' does not match hex pattern");
     }
 
     #[test]
     fn email_like_match(s in "[a-z]{1,10}@[a-z]{1,10}\\.[a-z]{2,4}") {
-        let re = Regex::new(r"^[a-z]{1,10}@[a-z]{1,10}\.[a-z]{2,4}$").unwrap();
-        prop_assert!(re.is_match(&s), "'{s}' does not match email pattern");
+        prop_assert!(re_email().is_match(&s), "'{s}' does not match email pattern");
     }
 
     #[test]
     fn ipv4_like_match(
         s in "[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}"
     ) {
-        let re = Regex::new(
-            r"^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$"
-        ).unwrap();
-        prop_assert!(re.is_match(&s), "'{s}' does not match IPv4 pattern");
+        prop_assert!(re_ipv4().is_match(&s), "'{s}' does not match IPv4 pattern");
     }
 
     // -- Character class membership --

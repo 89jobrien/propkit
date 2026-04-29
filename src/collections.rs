@@ -108,7 +108,7 @@ proptest! {
             1..=5,
         )
     ) {
-        prop_assert!(vv.len() >= 1 && vv.len() <= 5);
+        prop_assert!(!vv.is_empty() && vv.len() <= 5);
         for inner in &vv {
             prop_assert!(inner.len() <= 3);
         }

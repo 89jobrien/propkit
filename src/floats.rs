@@ -8,7 +8,7 @@ proptest! {
 
     #[test]
     fn floats_in_range(x in -1e10f64..1e10f64) {
-        prop_assert!(x >= -1e10 && x <= 1e10);
+        prop_assert!((-1e10..=1e10).contains(&x));
     }
 
     #[test]
@@ -99,9 +99,7 @@ proptest! {
 
     #[test]
     fn next_up_down_roundtrip(x in proptest::num::f64::NORMAL) {
-        if x.is_nan() || x == f64::INFINITY || x == f64::NEG_INFINITY {
-            return Ok(());
-        }
+        // NORMAL already excludes NaN and infinity.
         let up = next_up_f64(x);
         let down = next_down_f64(up);
         prop_assert_eq!(down, x);
@@ -109,9 +107,7 @@ proptest! {
 
     #[test]
     fn next_down_up_roundtrip(x in proptest::num::f64::NORMAL) {
-        if x.is_nan() || x == f64::INFINITY || x == f64::NEG_INFINITY {
-            return Ok(());
-        }
+        // NORMAL already excludes NaN and infinity.
         let down = next_down_f64(x);
         let up = next_up_f64(down);
         prop_assert_eq!(up, x);
@@ -121,18 +117,12 @@ proptest! {
 
     #[test]
     fn up_means_greater(x in proptest::num::f64::NORMAL) {
-        if x.is_nan() || x == f64::INFINITY {
-            return Ok(());
-        }
         let up = next_up_f64(x);
         prop_assert!(up >= x, "next_up({x}) = {up} < {x}");
     }
 
     #[test]
     fn down_means_lesser(x in proptest::num::f64::NORMAL) {
-        if x.is_nan() || x == f64::NEG_INFINITY {
-            return Ok(());
-        }
         let down = next_down_f64(x);
         prop_assert!(down <= x, "next_down({x}) = {down} > {x}");
     }

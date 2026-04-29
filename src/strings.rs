@@ -103,7 +103,7 @@ proptest! {
     #[test]
     fn string_length_bounded(s in ".{3,8}") {
         let char_count = s.chars().count();
-        prop_assert!(char_count >= 3 && char_count <= 8);
+        prop_assert!((3..=8).contains(&char_count));
     }
 
     // -- Empty string is valid --

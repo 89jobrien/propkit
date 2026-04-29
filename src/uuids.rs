@@ -5,7 +5,16 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
 use proptest::prelude::*;
+use regex::Regex;
+use std::sync::OnceLock;
 use uuid::{Uuid, Variant, Version};
+
+fn re_uuid() -> &'static Regex {
+    static RE: OnceLock<Regex> = OnceLock::new();
+    RE.get_or_init(|| {
+        Regex::new(r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$").unwrap()
+    })
+}
 
 /// Arbitrary UUID v4 built from random bytes.
 ///
@@ -52,12 +61,7 @@ proptest! {
     #[test]
     fn uuid_string_format(u in arb_uuid_bytes()) {
         let s = u.to_string();
-        // 8-4-4-4-12 groups of hex digits, lowercase
-        let re = regex::Regex::new(
-            r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
-        )
-        .unwrap();
-        prop_assert!(re.is_match(&s), "UUID string did not match pattern: {s}");
+        prop_assert!(re_uuid().is_match(&s), "UUID string did not match pattern: {s}");
     }
 
     /// Hyphenated string is exactly 36 characters long.

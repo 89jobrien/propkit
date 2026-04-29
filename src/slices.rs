@@ -48,8 +48,8 @@ impl Slice {
         };
 
         let (start, stop) = if step > 0 {
-            let start = self.start.map_or(0, |s| resolve(s));
-            let stop = self.stop.map_or(len, |s| resolve(s));
+            let start = self.start.map_or(0, &resolve);
+            let stop = self.stop.map_or(len, &resolve);
             (start, stop)
         } else {
             let start = self.start.map_or(len - 1, |s| resolve(s).min(len - 1));
@@ -102,7 +102,7 @@ proptest! {
     fn start_within_bounds(slice in arb_slice(20)) {
         if let Some(start) = slice.start {
             prop_assert!(
-                start >= -20 && start <= 20,
+                (-20..=20).contains(&start),
                 "start {start} out of bounds"
             );
         }
@@ -112,7 +112,7 @@ proptest! {
     fn stop_within_bounds(slice in arb_slice(20)) {
         if let Some(stop) = slice.stop {
             prop_assert!(
-                stop >= -20 && stop <= 20,
+                (-20..=20).contains(&stop),
                 "stop {stop} out of bounds"
             );
         }
@@ -168,10 +168,20 @@ proptest! {
             step: Some(step as isize),
         };
         let result = slice.apply(&data);
-        // Each element should come from a later index than the previous
-        for i in 1..result.len() {
-            // We can't check index order directly, but verify non-empty
-            let _ = result[i];
+        // With a positive step, each element is drawn from source indices
+        // start, start+step, start+2*step, ... which are strictly increasing.
+        // Verify the expected source indices directly.
+        let expected_indices: Vec<usize> = (start..10).step_by(step).collect();
+        prop_assert_eq!(
+            result.len(),
+            expected_indices.len(),
+            "result length mismatch"
+        );
+        for (i, &src_idx) in expected_indices.iter().enumerate() {
+            prop_assert_eq!(
+                result[i], data[src_idx],
+                "element {} should come from index {}", i, src_idx
+            );
         }
     }
 }

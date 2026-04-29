@@ -8,12 +8,12 @@ proptest! {
 
     #[test]
     fn i32_in_range(x in -1000i32..=1000i32) {
-        prop_assert!(x >= -1000 && x <= 1000);
+        prop_assert!((-1000..=1000).contains(&x));
     }
 
     #[test]
     fn u64_in_range(x in 100u64..=999u64) {
-        prop_assert!(x >= 100 && x <= 999);
+        prop_assert!((100..=999).contains(&x));
     }
 
     #[test]
@@ -55,7 +55,7 @@ proptest! {
 
     #[test]
     fn f64_bounds(x in -100.0f64..=100.0f64) {
-        prop_assert!(x >= -100.0 && x <= 100.0);
+        prop_assert!((-100.0..=100.0).contains(&x));
     }
 
     // -- Excluded endpoints via filter --

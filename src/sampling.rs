@@ -9,10 +9,9 @@ proptest! {
 
     #[test]
     fn sampled_is_member(
-        idx in 0..10usize,
+        value in prop::sample::select(vec![10, 20, 30, 40, 50, 60, 70, 80, 90, 100]),
     ) {
         let source = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
-        let value = source[idx];
         prop_assert!(source.contains(&value));
     }
 
@@ -75,7 +74,7 @@ proptest! {
             1 => Just(3),
         ]
     ) {
-        prop_assert!(v >= 1 && v <= 3);
+        prop_assert!((1..=3).contains(&v));
     }
 
     // -- Snapshot immutability: strategy built from a clone --
