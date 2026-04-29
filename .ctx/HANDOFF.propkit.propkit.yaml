@@ -1,22 +1,23 @@
 project: propkit
-updated: "20260429:150641"
+updated: "20260429:150837"
 items:
   - id: pk-004
     title: Add complex number module (num-complex)
     status: open
     priority: P3
     notes: Port test_complex_numbers.py — magnitude bounds, subnormal filtering
-  - id: pk-005
-    title: Add CI workflow
-    status: open
-    priority: P1
-    notes: GitHub Actions — cargo test, clippy, fmt check
-  - id: pk-006
-    title: Add LICENSE files
-    status: open
-    priority: P1
-    notes: MIT + Apache-2.0 dual license files
 log:
+  - date: "20260429:150837"
+    session: 3
+    summary: "Added MIT+Apache-2.0 licenses and GitHub Actions CI workflow (test, clippy, fmt)"
+    commits:
+      - 71aec91
+  - date: "20260429:150641"
+    session: 2
+    summary: "Added datetimes (18 tests), uuids (9 tests), recursive (7 tests) — 133 total passing"
+    commits:
+      - b6baa3d
+      - 3e11397
   - date: "20260429:150641"
     session: 2
     summary: "Added datetimes (18 tests), uuids (9 tests), recursive (7 tests) — 133 total passing"
