@@ -8,9 +8,15 @@ description = "Reusable proptest property suites ported from Hypothesis"
 [features]
 default = []
 strategies = ["dep:proptest"]
+chrono = ["strategies", "dep:chrono"]
+regex = ["strategies", "dep:regex"]
+uuid = ["strategies", "dep:uuid"]
 
 [dependencies]
 proptest = { version = "1", optional = true }
+chrono = { version = "0.4", optional = true }
+regex = { version = "1", optional = true }
+uuid = { version = "1", features = ["v4"], optional = true }
 
 [dev-dependencies]
 chrono = "0.4"

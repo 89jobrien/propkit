@@ -7,3 +7,10 @@ pub mod floats;
 pub mod permutations;
 pub mod recursive;
 pub mod slices;
+
+#[cfg(feature = "chrono")]
+pub mod datetimes;
+#[cfg(feature = "regex")]
+pub mod regex_props;
+#[cfg(feature = "uuid")]
+pub mod uuids;
