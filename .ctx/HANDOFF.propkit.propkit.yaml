@@ -1,5 +1,5 @@
 project: propkit
-updated: 2026-04-29
+updated: "20260429:150641"
 items:
   - id: pk-004
     title: Add complex number module (num-complex)
@@ -17,7 +17,15 @@ items:
     priority: P1
     notes: MIT + Apache-2.0 dual license files
 log:
-  - date: 2026-04-29
-    note: "Added datetimes (18 tests), uuids (9 tests), recursive (7 tests) — b6baa3d"
-  - date: 2026-04-28
-    note: "Initial crate created with 99 tests across 9 modules — 9d73bf0"
+  - date: "20260429:150641"
+    session: 2
+    summary: "Added datetimes (18 tests), uuids (9 tests), recursive (7 tests) — 133 total passing"
+    commits:
+      - b6baa3d
+      - 3e11397
+  - date: "20260428:195147"
+    session: 1
+    summary: "Initial crate — 99 proptest properties across 9 modules, public repo created"
+    commits:
+      - 9d73bf0
+      - c58e989
