@@ -30,7 +30,7 @@ mod chrono_tests {
             d in propkit::strategies::datetimes::arb_duration_small()
         ) {
             let secs = d.num_seconds();
-            prop_assert!(secs >= -86_400 && secs <= 86_400);
+            prop_assert!((-86_400..=86_400).contains(&secs));
         }
 
         #[test]

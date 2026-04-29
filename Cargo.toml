@@ -1,5 +1,5 @@
 [workspace]
-members = ["propkit"]
+members = ["propkit", "propkit-cli"]
 resolver = "2"
 
 [workspace.package]

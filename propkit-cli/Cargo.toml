@@ -1,0 +1,17 @@
+[package]
+name = "propkit-cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "CLI scanner that recommends property tests for Rust crates"
+
+[[bin]]
+name = "propkit"
+path = "src/main.rs"
+
+[dependencies]
+clap = { version = "4", features = ["derive"] }
+syn = { version = "2", features = ["full", "visit"] }
+quote = "1"
+proc-macro2 = "1"
+walkdir = "2"
