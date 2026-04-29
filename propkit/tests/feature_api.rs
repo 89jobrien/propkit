@@ -1,5 +1,25 @@
 //! Red-phase tests for chrono/regex/uuid feature-gated public APIs.
 
+// -- complex feature --
+
+#[cfg(feature = "complex")]
+mod complex_tests {
+    use proptest::prelude::*;
+
+    proptest! {
+        #[test]
+        fn arb_complex_works(z in propkit::strategies::complex::arb_complex()) {
+            prop_assert!(z.re.is_finite());
+        }
+
+        #[test]
+        fn arb_complex_bounded_works(z in propkit::strategies::complex::arb_complex_bounded(1.0)) {
+            prop_assert!(z.re.abs() <= 1.0);
+            prop_assert!(z.im.abs() <= 1.0);
+        }
+    }
+}
+
 // -- chrono feature --
 
 #[cfg(feature = "chrono")]

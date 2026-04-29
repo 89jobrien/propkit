@@ -8,6 +8,8 @@ pub mod permutations;
 pub mod recursive;
 pub mod slices;
 
+#[cfg(feature = "complex")]
+pub mod complex;
 #[cfg(feature = "chrono")]
 pub mod datetimes;
 #[cfg(feature = "regex")]

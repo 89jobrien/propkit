@@ -50,6 +50,7 @@ feature flags (see design spec for details).
 | `regex_props.rs`  | Pattern match-back, char class, anchoring, alternation          |
 | `sampling.rs`     | Membership, filtered correctness, uniqueness, weighted          |
 | `slices.rs`       | Python-style slice semantics: step != 0, bounds, subset         |
+| `complex.rs`      | Complex64 magnitude, conjugate, arithmetic, triangle inequality |
 | `composition.rs`  | flat_map, map, filter chaining, ordered pairs, unions           |
 | `datetimes.rs`    | NaiveDate/Time/DateTime bounds, duration, leap years            |
 | `recursive.rs`    | Tree generation, depth bounds, leaf-only, size limits           |
