@@ -5,7 +5,12 @@ edition.workspace = true
 license.workspace = true
 description = "Reusable proptest property suites ported from Hypothesis"
 
+[features]
+default = []
+strategies = ["dep:proptest"]
+
 [dependencies]
+proptest = { version = "1", optional = true }
 
 [dev-dependencies]
 chrono = "0.4"
