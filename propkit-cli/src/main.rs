@@ -4,6 +4,7 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
 mod analyzer;
+mod generator;
 
 use clap::{Parser, Subcommand};
 use std::path::{Path, PathBuf};
@@ -59,8 +60,34 @@ fn main() {
             let analyses = scan_crate(&path);
             print!("{}", analyzer::format_analysis(&analyses));
         }
-        Command::Generate { path, .. } => {
-            eprintln!("generate: {} (not yet implemented)", path.display());
+        Command::Generate {
+            path,
+            dry_run,
+            confidence,
+            o,
+            ..
+        } => {
+            let min_confidence = match confidence.as_str() {
+                "high" => analyzer::Confidence::High,
+                "low" => analyzer::Confidence::Low,
+                _ => analyzer::Confidence::Medium,
+            };
+            let analyses = scan_crate(&path);
+            let output = generator::generate_tests(&analyses, min_confidence);
+
+            eprintln!("note: add proptest to dev-dependencies: cargo add --dev proptest");
+
+            if dry_run {
+                print!("{output}");
+            } else {
+                let out_path = o.unwrap_or_else(|| path.join("tests/propkit_properties.rs"));
+                if let Some(parent) = out_path.parent() {
+                    std::fs::create_dir_all(parent).ok();
+                }
+                std::fs::write(&out_path, &output)
+                    .unwrap_or_else(|e| eprintln!("error writing {}: {e}", out_path.display()));
+                eprintln!("wrote {}", out_path.display());
+            }
         }
     }
 }
