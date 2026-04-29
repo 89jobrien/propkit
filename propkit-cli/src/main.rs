@@ -3,8 +3,10 @@
 // Copyright 2026 Joseph O'Brien
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
+mod analyzer;
+
 use clap::{Parser, Subcommand};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 #[derive(Parser)]
 #[command(
@@ -54,10 +56,27 @@ fn main() {
     let cli = Cli::parse();
     match cli.command {
         Command::Scan { path } => {
-            eprintln!("scan: {} (not yet implemented)", path.display());
+            let analyses = scan_crate(&path);
+            print!("{}", analyzer::format_analysis(&analyses));
         }
         Command::Generate { path, .. } => {
             eprintln!("generate: {} (not yet implemented)", path.display());
         }
     }
+}
+
+fn scan_crate(path: &Path) -> Vec<analyzer::FileAnalysis> {
+    let mut analyses = Vec::new();
+    for entry in walkdir::WalkDir::new(path)
+        .into_iter()
+        .filter_map(|e| e.ok())
+    {
+        let p = entry.path();
+        if p.extension().is_some_and(|ext| ext == "rs")
+            && let Some(analysis) = analyzer::analyze_file(p)
+        {
+            analyses.push(analysis);
+        }
+    }
+    analyses
 }
