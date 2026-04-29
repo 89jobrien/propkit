@@ -1,14 +1,8 @@
-[package]
-name = "propkit"
+[workspace]
+members = ["propkit"]
+resolver = "2"
+
+[workspace.package]
 version = "0.0.1"
 edition = "2024"
 license = "MIT OR Apache-2.0"
-description = "Reusable proptest property suites ported from Hypothesis"
-
-[dependencies]
-
-[dev-dependencies]
-chrono = "0.4"
-proptest = "1"
-regex = "1"
-uuid = { version = "1", features = ["v4"] }

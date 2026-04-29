@@ -1,52 +1,66 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to Claude Code (claude.ai/code) when working with
+code in this repository.
 
 ## What This Is
 
-propkit is a test-only Rust crate containing 99 proptest property-based tests ported from
-Python's Hypothesis framework (hypothesis-python/tests/cover + nocover). It has no library
-code -- all modules are `#[cfg(test)]` only.
+propkit is a Cargo workspace containing:
+
+- **propkit** (lib) -- reusable proptest strategies behind feature flags, plus
+  133 property-based tests ported from Python's Hypothesis framework
+- **propkit-cli** (bin, planned) -- scans a target crate's source, recommends
+  property tests, and optionally generates standalone test files
+
+## Workspace Layout
+
+```
+propkit/              # workspace root
+  Cargo.toml          # [workspace] manifest
+  propkit/            # lib crate
+    Cargo.toml
+    src/
+      lib.rs
+      *.rs            # strategy + test modules
+  propkit-cli/        # bin crate (planned)
+```
 
 ## Commands
 
 ```bash
-cargo test                         # run all 99 property tests
-cargo test floats                  # run a single module
-cargo test floats::up_means_greater # run a single test
-cargo fmt --all                    # format (pre-commit hook enforces this)
-cargo clippy                       # lint
+cargo test                         # run all 133 property tests
+cargo test -p propkit floats       # run a single module
+cargo fmt --all                    # format
+cargo clippy --all-targets         # lint
 ```
 
 ## Architecture
 
-The crate is a flat set of test modules in `src/`, each covering a domain of universal
-PBT properties. There is no public API -- this is a test suite, not a library.
+The lib crate contains test modules in `propkit/src/`, each covering a domain
+of universal PBT properties. Several modules expose public strategies behind
+feature flags (see design spec for details).
 
-| Module            | What it tests                                                                              |
-| ----------------- | ------------------------------------------------------------------------------------------ |
-| `floats.rs`       | f64/f32 bounds, NaN/inf filtering, subnormal control, next_up/next_down roundtrip          |
-| `collections.rs`  | Vec/HashSet/HashMap size bounds, uniqueness, uniqueness-by-key, nesting                    |
-| `strings.rs`      | Alphabet constraints, UTF-8 validity, char exclusion, ASCII-only                           |
-| `numerics.rs`     | Integer/float bounds, commutativity, associativity, division identity, wrapping/saturating |
-| `permutations.rs` | Length/element preservation, no duplicates, composition, sort recovery                     |
-| `regex_props.rs`  | Pattern match-back, char class membership, anchoring, alternation                          |
-| `sampling.rs`     | Membership, filtered correctness, uniqueness, weighted sampling                            |
-| `slices.rs`       | Python-style slice semantics: step != 0, no-panic application, bounds, result subset       |
-| `composition.rs`  | prop_flat_map, prop_map, prop_filter chaining, ordered pairs, constant lists, unions       |
+| Module            | What it tests                                                   |
+| ----------------- | --------------------------------------------------------------- |
+| `floats.rs`       | f64/f32 bounds, NaN/inf, subnormal, next_up/next_down roundtrip |
+| `collections.rs`  | Vec/HashSet/HashMap size, uniqueness, nesting                   |
+| `strings.rs`      | Alphabet constraints, UTF-8, char exclusion, ASCII-only         |
+| `numerics.rs`     | Integer/float bounds, commutativity, associativity, wrapping    |
+| `permutations.rs` | Length/element preservation, no duplicates, composition         |
+| `regex_props.rs`  | Pattern match-back, char class, anchoring, alternation          |
+| `sampling.rs`     | Membership, filtered correctness, uniqueness, weighted          |
+| `slices.rs`       | Python-style slice semantics: step != 0, bounds, subset         |
+| `composition.rs`  | flat_map, map, filter chaining, ordered pairs, unions           |
+| `datetimes.rs`    | NaiveDate/Time/DateTime bounds, duration, leap years            |
+| `recursive.rs`    | Tree generation, depth bounds, leaf-only, size limits           |
+| `uuids.rs`        | UUID v4 version/variant, string roundtrip, uniqueness           |
 
 ## Conventions
 
 - Rust edition 2024.
 - All tests use the `proptest!` macro, not `#[proptest]` attribute.
-- `floats.rs` includes stable-Rust `next_up_f64`/`next_down_f64` helpers (bit manipulation)
+- `floats.rs` includes stable-Rust `next_up_f64`/`next_down_f64` helpers
   since the std methods are nightly-only.
-- `slices.rs` defines a `Slice` struct implementing Python-style slicing for test purposes.
-- `permutations.rs` defines `arb_permutation(n)` -- a custom strategy that generates
-  permutations of `0..n` by sorting random keys.
-
-## Adding New Modules
-
-1. Create `src/<domain>.rs` with `use proptest::prelude::*;` and a `proptest! {}` block.
-2. Add `#[cfg(test)] mod <domain>;` to `src/lib.rs`.
-3. If new dev-dependencies are needed, add to `[dev-dependencies]` in Cargo.toml.
+- `slices.rs` defines a `Slice` struct for Python-style slicing.
+- `permutations.rs` defines `arb_permutation(n)` -- custom strategy via
+  sorted random keys.
