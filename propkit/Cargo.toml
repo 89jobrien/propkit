@@ -26,3 +26,43 @@ num-complex = "0.4"
 proptest = "1"
 regex = "1"
 uuid = { version = "1", features = ["v4"] }
+
+[[test]]
+name = "floats"
+required-features = ["strategies"]
+
+[[test]]
+name = "permutations"
+required-features = ["strategies"]
+
+[[test]]
+name = "slices"
+required-features = ["strategies"]
+
+[[test]]
+name = "recursive"
+required-features = ["strategies"]
+
+[[test]]
+name = "complex"
+required-features = ["complex"]
+
+[[test]]
+name = "datetimes"
+required-features = ["chrono"]
+
+[[test]]
+name = "regex_props"
+required-features = ["regex"]
+
+[[test]]
+name = "uuids"
+required-features = ["uuid"]
+
+[[test]]
+name = "public_api"
+required-features = ["strategies"]
+
+[[test]]
+name = "feature_api"
+required-features = ["complex", "chrono", "regex", "uuid"]
