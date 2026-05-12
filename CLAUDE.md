@@ -9,8 +9,8 @@ propkit is a Cargo workspace containing:
 
 - **propkit** (lib) -- reusable proptest strategies behind feature flags, plus
   133 property-based tests ported from Python's Hypothesis framework
-- **propkit-cli** (bin, planned) -- scans a target crate's source, recommends
-  property tests, and optionally generates standalone test files
+- **propkit-cli** (bin) -- scans a target crate's source, recommends property
+  tests, generates standalone test files, and scaffolds test infrastructure
 
 ## Workspace Layout
 
@@ -22,16 +22,36 @@ propkit/              # workspace root
     src/
       lib.rs
       *.rs            # strategy + test modules
-  propkit-cli/        # bin crate (planned)
+  propkit-cli/        # bin crate
+    src/
+      main.rs         # CLI entry (scan, generate, scaffold)
+      analyzer.rs     # syn-based trait/fn detection
+      generators/
+        mod.rs
+        property.rs   # proptest code generation
+        smolvm.rs     # smolvm test helpers scaffold
+        testlinux.rs  # TestLinux VM runner scaffold
+    tests/
+      scaffold_test.rs
 ```
+
+### Scaffold Generators
+
+| Generator   | Output                    | What it produces                                        |
+| ----------- | ------------------------- | ------------------------------------------------------- |
+| `smolvm`    | `tests/smolvm_helpers.rs` | RAII VM guard, free_port, wait_for_tcp, DB fixtures     |
+| `testlinux` | `tests/testlinux.rs`      | Compiler/InitramfsBuilder/VmRunner traits, orchestrator |
 
 ## Commands
 
 ```bash
-cargo test                         # run all 133 property tests
-cargo test -p propkit floats       # run a single module
-cargo fmt --all                    # format
-cargo clippy --all-targets         # lint
+cargo test                                          # run all property tests
+cargo test -p propkit floats                        # run a single module
+cargo nextest run -p propkit-cli -- scaffold         # scaffold tests only
+cargo run -p propkit-cli -- scaffold smolvm --dry-run     # preview smolvm helpers
+cargo run -p propkit-cli -- scaffold testlinux --dry-run  # preview testlinux runner
+cargo fmt --all                                     # format
+cargo clippy --all-targets                          # lint
 ```
 
 ## Architecture
