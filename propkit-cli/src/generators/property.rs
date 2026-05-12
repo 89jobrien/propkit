@@ -171,7 +171,7 @@ fn generate_type_test(ty: &TypeInfo, prop: &Property) -> Option<String> {
     }
 }
 
-fn to_snake_case(s: &str) -> String {
+pub fn to_snake_case(s: &str) -> String {
     let mut result = String::new();
     for (i, c) in s.chars().enumerate() {
         if c.is_uppercase() {

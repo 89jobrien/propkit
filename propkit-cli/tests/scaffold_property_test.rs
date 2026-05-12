@@ -46,6 +46,41 @@ mod smolvm_properties {
             let output = smolvm::generate(&name);
             prop_assert!(!output.is_empty());
         }
+
+        #[test]
+        fn braces_are_balanced(name in arb_crate_name()) {
+            let output = smolvm::generate(&name);
+            prop_assert_eq!(
+                output.matches('{').count(),
+                output.matches('}').count(),
+                "unbalanced braces"
+            );
+        }
+
+        #[test]
+        fn contains_key_api_surface(name in arb_crate_name()) {
+            let output = smolvm::generate(&name);
+            for symbol in &["SmolvmMachine", "free_port", "wait_for_tcp",
+                            "smolvm_or_skip", "start_postgres", "start_redis"] {
+                prop_assert!(
+                    output.contains(symbol),
+                    "missing {symbol} in output"
+                );
+            }
+        }
+
+        #[test]
+        fn no_raw_format_placeholders(name in arb_crate_name()) {
+            let output = smolvm::generate(&name);
+            prop_assert!(
+                !output.contains("{crate_name}"),
+                "leaked raw {{crate_name}} placeholder"
+            );
+            prop_assert!(
+                !output.contains("{{}}"),
+                "leaked empty format escape {{}}"
+            );
+        }
     }
 }
 
@@ -81,6 +116,41 @@ mod testlinux_properties {
         fn output_is_nonempty(name in arb_crate_name()) {
             let output = testlinux::generate(&name);
             prop_assert!(!output.is_empty());
+        }
+
+        #[test]
+        fn braces_are_balanced(name in arb_crate_name()) {
+            let output = testlinux::generate(&name);
+            prop_assert_eq!(
+                output.matches('{').count(),
+                output.matches('}').count(),
+                "unbalanced braces"
+            );
+        }
+
+        #[test]
+        fn contains_key_api_surface(name in arb_crate_name()) {
+            let output = testlinux::generate(&name);
+            for symbol in &["TestLinux", "Compiler", "InitramfsBuilder",
+                            "VmRunner", "MuslCompiler", "CpioInitramfs", "QemuHvf"] {
+                prop_assert!(
+                    output.contains(symbol),
+                    "missing {symbol} in output"
+                );
+            }
+        }
+
+        #[test]
+        fn no_raw_format_placeholders(name in arb_crate_name()) {
+            let output = testlinux::generate(&name);
+            prop_assert!(
+                !output.contains("{crate_name}"),
+                "leaked raw {{crate_name}} placeholder"
+            );
+            prop_assert!(
+                !output.contains("{{}}"),
+                "leaked empty format escape {{}}"
+            );
         }
     }
 }
