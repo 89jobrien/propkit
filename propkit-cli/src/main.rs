@@ -4,7 +4,7 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 
 mod analyzer;
-mod generator;
+mod generators;
 
 use clap::{Parser, Subcommand};
 use std::path::{Path, PathBuf};
@@ -73,7 +73,7 @@ fn main() {
                 _ => analyzer::Confidence::Medium,
             };
             let analyses = scan_crate(&path);
-            let output = generator::generate_tests(&analyses, min_confidence);
+            let output = generators::property::generate_tests(&analyses, min_confidence);
 
             eprintln!("note: add proptest to dev-dependencies: cargo add --dev proptest");
 
