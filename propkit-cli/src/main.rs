@@ -51,6 +51,39 @@ enum Command {
         #[arg(short)]
         o: Option<PathBuf>,
     },
+    /// Scaffold reusable test infrastructure modules
+    Scaffold {
+        #[command(subcommand)]
+        kind: ScaffoldKind,
+    },
+}
+
+#[derive(Subcommand)]
+enum ScaffoldKind {
+    /// Generate smolvm test helpers (RAII VM guard, port utils, fixtures)
+    Smolvm {
+        /// Print to stdout instead of writing a file
+        #[arg(long)]
+        dry_run: bool,
+        /// Custom output path
+        #[arg(short)]
+        o: Option<PathBuf>,
+        /// Crate name for module header
+        #[arg(long, default_value = "my_crate")]
+        crate_name: String,
+    },
+    /// Generate TestLinux VM runner (cross-compile + QEMU boot)
+    Testlinux {
+        /// Print to stdout instead of writing a file
+        #[arg(long)]
+        dry_run: bool,
+        /// Custom output path
+        #[arg(short)]
+        o: Option<PathBuf>,
+        /// Crate name for module header
+        #[arg(long, default_value = "my_crate")]
+        crate_name: String,
+    },
 }
 
 fn main() {
@@ -89,6 +122,38 @@ fn main() {
                 eprintln!("wrote {}", out_path.display());
             }
         }
+        Command::Scaffold { kind } => match kind {
+            ScaffoldKind::Smolvm {
+                dry_run,
+                o,
+                crate_name,
+            } => {
+                let output = generators::smolvm::generate(&crate_name);
+                emit_scaffold(output, dry_run, o, "tests/smolvm_helpers.rs");
+            }
+            ScaffoldKind::Testlinux {
+                dry_run,
+                o,
+                crate_name,
+            } => {
+                let output = generators::testlinux::generate(&crate_name);
+                emit_scaffold(output, dry_run, o, "tests/testlinux.rs");
+            }
+        },
+    }
+}
+
+fn emit_scaffold(output: String, dry_run: bool, o: Option<PathBuf>, default: &str) {
+    if dry_run {
+        print!("{output}");
+    } else {
+        let out_path = o.unwrap_or_else(|| PathBuf::from(default));
+        if let Some(parent) = out_path.parent() {
+            std::fs::create_dir_all(parent).ok();
+        }
+        std::fs::write(&out_path, &output)
+            .unwrap_or_else(|e| eprintln!("error writing {}: {e}", out_path.display()));
+        eprintln!("wrote {}", out_path.display());
     }
 }
 
