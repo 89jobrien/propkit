@@ -6,7 +6,7 @@
 mod analyzer;
 mod generators;
 
-use clap::{Parser, Subcommand};
+use clap::{CommandFactory, Parser, Subcommand};
 use std::path::{Path, PathBuf};
 
 #[derive(Parser)]
@@ -87,6 +87,15 @@ enum ScaffoldKind {
 }
 
 fn main() {
+    if std::env::args().nth(1).as_deref() == Some("completions") {
+        clap_complete::generate(
+            clap_complete_nushell::Nushell,
+            &mut Cli::command(),
+            "propkit",
+            &mut std::io::stdout(),
+        );
+        return;
+    }
     let cli = Cli::parse();
     match cli.command {
         Command::Scan { path } => {
